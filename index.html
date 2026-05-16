@@ -120,6 +120,8 @@ input[type=text]:focus,select:focus{border-color:var(--ac)}
 .nr{color:var(--mu);font-size:13px;padding:30px;text-align:center;width:100%}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2a1a;border:1px solid #4ade80;border-radius:10px;padding:10px 20px;color:#4ade80;font-size:13px;font-weight:600;z-index:9999;transition:transform .3s;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
+.br{background:transparent;color:var(--mu);border:1px solid var(--bd2);border-radius:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.br:hover{border-color:#f87171;color:#f87171}
 
 </style>
 </head>
@@ -130,6 +132,7 @@ input[type=text]:focus,select:focus{border-color:var(--ac)}
     <div class="bg2">
       <button class="bs2" onclick="openPanel('deck')">📋 Importar deck</button>
       <button class="bp"  onclick="openPanel('single')">＋ Agregar carta</button>
+      <button class="br"  onclick="resetMeta()">🔄 Resetear</button>
     </div>
   </div>
   <div class="ctrl">
@@ -697,6 +700,27 @@ function dBack(){
 
 function addCard(d){ ALL_DATA.push({...d,isExtra:true}); sl(ALL_DATA.filter(x=>x.isExtra)); document.getElementById('total-n').textContent=ALL_DATA.length; filter(); }
 function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// ── Reset ──
+function resetMeta(){
+  if(!confirm('¿Resetear el meta?\nEsto borra todas las cartas agregadas manualmente y el caché de imágenes.\nLas 205 cartas base se mantienen.')) return;
+  // Clear localStorage (extra cards)
+  localStorage.removeItem('ptcg_meta');
+  // Clear IndexedDB (image cache)
+  if(DB){
+    const tx = DB.transaction('imgs','readwrite');
+    tx.objectStore('imgs').clear();
+  }
+  // Clear memory cache
+  Object.keys(MC).forEach(k => delete MC[k]);
+  // Reset data
+  ALL_DATA = [...BASE_DATA];
+  document.getElementById('total-n').textContent = ALL_DATA.length;
+  document.getElementById('cached-n').textContent = 0;
+  renderGrid(ALL_DATA);
+  showToast('✅ Meta reseteado — recargando imágenes...');
+  setTimeout(() => precache(), 500);
+}
 
 // ── Init ──
 async function init(){
