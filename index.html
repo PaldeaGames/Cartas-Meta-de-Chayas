@@ -445,33 +445,42 @@ input[type=text]:focus, select:focus { border-color: var(--accent); }
 
     <!-- MODO 2: Deck completo -->
     <div class="mode-panel" id="modeDeck">
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
-           ondragover="event.preventDefault();this.classList.add('drag')"
-           ondragleave="this.classList.remove('drag')"
-           ondrop="handleDrop(event)">
-        <div class="upload-icon">📷</div>
-        <div class="upload-label">
-          <strong>Toca para seleccionar la foto del deck</strong><br>
-          o arrastra la imagen aquí<br>
-          <span style="font-size:11px;opacity:.6">JPG, PNG — foto completa del deck en filas</span>
+
+      <!-- PASO 1: pegar lista -->
+      <div id="deckStep1">
+        <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.8">
+          <span style="color:var(--accent);font-weight:700">💡 Cómo usarlo:</span><br>
+          Manda la foto del deck al chat de Claude &rarr; te entrega la lista de nombres &rarr; pégala aquí abajo.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+          <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700">Nombre del deck</span>
+          <input type="text" id="deckNameLabel" placeholder="Ej: Meganium/Planta" style="background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:6px 10px;color:var(--text);font-size:12px;outline:none">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px">
+          <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700">Lista de cartas</span>
+          <textarea id="deckNamesList" rows="8" placeholder="Chikorita, Bayleef, Meganium, Boss Orders, Ultra Ball, Poke Pad..." style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;color:var(--text);font-size:12px;resize:vertical;outline:none;line-height:1.6"></textarea>
+        </div>
+        <button class="btn-confirm" style="width:100%" onclick="processDeckList()">🔍 Buscar imágenes en la API</button>
+        <div class="status-box" id="statusBox" style="margin-top:12px">
+          <div class="status-text" id="statusText"></div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
         </div>
       </div>
-      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])">
-      <img id="uploadPreview" class="upload-preview">
 
-      <div class="status-box" id="statusBox">
-        <div class="status-text" id="statusText">Analizando imagen con IA...</div>
-        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-      </div>
-
-      <div id="detectedSection" style="display:none">
-        <div style="font-size:12px;color:var(--muted);margin-bottom:10px" id="detectedInfo"></div>
+      <!-- PASO 2: confirmar -->
+      <div id="deckStep2" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <button onclick="backToDeckStep1()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px">&#8592;</button>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">Confirmar cartas</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px" id="detectedInfo"></div>
         <div class="detected-grid" id="detectedGrid"></div>
-        <div class="action-row">
-          <button class="btn-confirm" onclick="confirmDeck()">✅ Agregar todas al cheat sheet</button>
-          <button class="btn-cancel-sm" onclick="resetDeck()">↩ Nueva foto</button>
+        <div class="action-row" style="margin-top:12px">
+          <button class="btn-confirm" onclick="confirmDeck()">&#10003; Agregar al cheat sheet</button>
+          <button class="btn-cancel-sm" onclick="backToDeckStep1()">&#8629; Editar lista</button>
         </div>
       </div>
+
     </div>
 
   </div>
