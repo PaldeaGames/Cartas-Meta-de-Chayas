@@ -729,23 +729,36 @@ function showToast(m){ const t=document.getElementById('toast'); t.textContent=m
 
 // ── Reset ──
 function resetMeta(){
-  if(!confirm('¿Resetear el meta?\nEsto borra todas las cartas agregadas manualmente y el caché de imágenes.\nLas 205 cartas base se mantienen.')) return;
-  // Clear localStorage (extra cards)
+  if(!confirm('¿Resetear completamente?\nSe borran las cartas extras, el caché de imágenes y se recargan todas desde cero.')) return;
+  // Clear localStorage
   localStorage.removeItem('ptcg_meta');
-  // Clear IndexedDB (image cache)
-  if(DB){
-    const tx = DB.transaction('imgs','readwrite');
-    tx.objectStore('imgs').clear();
-  }
-  // Clear memory cache
+  // Clear memory cache completely
   Object.keys(MC).forEach(k => delete MC[k]);
-  // Reset data
-  ALL_DATA = [...BASE_DATA];
-  document.getElementById('total-n').textContent = ALL_DATA.length;
-  document.getElementById('cached-n').textContent = 0;
-  renderGrid(ALL_DATA);
-  showToast('✅ Meta reseteado — recargando imágenes...');
-  setTimeout(() => precache(), 500);
+  // Delete and recreate IndexedDB to ensure clean slate
+  if(DB){ DB.close(); DB = null; }
+  const delReq = indexedDB.deleteDatabase('ptcg_cache');
+  delReq.onsuccess = async () => {
+    await openDB();
+    ALL_DATA = [...BASE_DATA];
+    document.getElementById('total-n').textContent = ALL_DATA.length;
+    document.getElementById('cached-n').textContent = 0;
+    renderGrid(ALL_DATA);
+    showToast('✅ Caché borrado — recargando imágenes...');
+    setTimeout(() => precache(), 300);
+  };
+  delReq.onerror = () => {
+    // Fallback: just clear the store
+    if(DB){
+      const tx = DB.transaction('imgs','readwrite');
+      tx.objectStore('imgs').clear();
+    }
+    ALL_DATA = [...BASE_DATA];
+    document.getElementById('total-n').textContent = ALL_DATA.length;
+    document.getElementById('cached-n').textContent = 0;
+    renderGrid(ALL_DATA);
+    showToast('✅ Reseteado — recargando...');
+    setTimeout(() => precache(), 300);
+  };
 }
 
 // ── Init ──
