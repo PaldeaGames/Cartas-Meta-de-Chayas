@@ -367,8 +367,8 @@ async function getImg(name){
     const r = await fetch('https://api.pokemontcg.io/v2/cards?q=name:"' + encodeURIComponent(name) + '"&pageSize=20&orderBy=-set.releaseDate&select=images,set,number,rarity');
     const d = await r.json();
     // Priority: Double Rare > Rare Holo > Rare > Uncommon > Common > anything else
-    const PRIO = ['Double Rare','Ultra Rare','Rare Holo EX','Rare Holo','Rare','Uncommon','Common'];
-    const SKIP = ['Special Illustration Rare','Hyper Rare','Illustration Rare','Shiny','Rainbow Rare','Amazing Rare','Radiant Rare','Trainer Gallery'];
+    const PRIO = ['Common','Uncommon','Rare','Rare Holo','Rare Holo EX','Double Rare','Ultra Rare'];
+    const SKIP = ['Special Illustration Rare','Hyper Rare','Illustration Rare','Shiny Rare','Shiny Ultra Rare','Rainbow Rare','Amazing Rare','Radiant Rare','ACE SPEC Rare'];
     let c = null;
     if(d.data && d.data.length){
       // First try to find a preferred rarity
