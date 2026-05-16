@@ -363,9 +363,24 @@ async function getImg(name){
   const cached = await dbGet(name);
   if(cached){ MC[name] = cached; return cached; }
   try{
-    const r = await fetch('https://api.pokemontcg.io/v2/cards?q=name:"' + encodeURIComponent(name) + '"&pageSize=1&orderBy=-set.releaseDate&select=images,set,number');
+    // Fetch multiple versions and pick the most standard rarity
+    const r = await fetch('https://api.pokemontcg.io/v2/cards?q=name:"' + encodeURIComponent(name) + '"&pageSize=20&orderBy=-set.releaseDate&select=images,set,number,rarity');
     const d = await r.json();
-    const c = d.data && d.data[0];
+    // Priority: Double Rare > Rare Holo > Rare > Uncommon > Common > anything else
+    const PRIO = ['Double Rare','Ultra Rare','Rare Holo EX','Rare Holo','Rare','Uncommon','Common'];
+    const SKIP = ['Special Illustration Rare','Hyper Rare','Illustration Rare','Shiny','Rainbow Rare','Amazing Rare','Radiant Rare','Trainer Gallery'];
+    let c = null;
+    if(d.data && d.data.length){
+      // First try to find a preferred rarity
+      for(const rar of PRIO){
+        const match = d.data.find(x => x.rarity === rar);
+        if(match){ c = match; break; }
+      }
+      // If not found, pick first that is NOT a special/hyper rare
+      if(!c) c = d.data.find(x => !SKIP.some(s => (x.rarity||'').includes(s)));
+      // Fallback to first result
+      if(!c) c = d.data[0];
+    }
     if(!c){ MC[name]={url:'',small:'',sn:'',num:'',tot:''}; return MC[name]; }
     const obj = {url: c.images.large||c.images.small||'', small: c.images.small||'', sn: c.set.name||'', num: c.number||'', tot: c.set.total||''};
     MC[name] = obj;
@@ -379,9 +394,20 @@ async function getImg(name){
 
 async function getVersions(name){
   try{
-    const r = await fetch('https://api.pokemontcg.io/v2/cards?q=name:"' + encodeURIComponent(name) + '"&pageSize=20&orderBy=-set.releaseDate&select=images,set,number');
+    const r = await fetch('https://api.pokemontcg.io/v2/cards?q=name:"' + encodeURIComponent(name) + '"&pageSize=30&orderBy=-set.releaseDate&select=images,set,number,rarity');
     const d = await r.json();
-    return d.data || [];
+    if(!d.data) return [];
+    // Sort: standard deck rarities first, special arts last
+    const PRIO = ['Common','Uncommon','Rare','Rare Holo','Rare Holo EX','Double Rare'];
+    const sorted = [...d.data].sort((a,b) => {
+      const ai = PRIO.indexOf(a.rarity);
+      const bi = PRIO.indexOf(b.rarity);
+      if(ai>=0 && bi<0) return -1;
+      if(bi>=0 && ai<0) return 1;
+      if(ai>=0 && bi>=0) return ai-bi;
+      return 0;
+    });
+    return sorted;
   }catch{ return []; }
 }
 
