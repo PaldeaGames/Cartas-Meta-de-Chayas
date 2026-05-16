@@ -874,11 +874,7 @@ async function processDeckList() {
   if (!raw) { showToast('Pega primero la lista de nombres'); return; }
 
   // Parsear nombres — separados por coma, punto y coma, o línea
-  const names = raw
-    .split(/[
-,;]+/)
-    .map(n => n.trim())
-    .filter(n => n.length > 1);
+  const names = raw.split(/[\n,;]+/).map(n => n.trim()).filter(n => n.length > 1);
 
   if (!names.length) { showToast('No se encontraron nombres válidos'); return; }
 
