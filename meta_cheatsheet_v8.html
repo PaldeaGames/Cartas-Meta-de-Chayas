@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meta Pokémon TCG — Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080810;--surface:#0f0f18;--surface2:#161622;
+  --border:#1e1e30;--border2:#2a2a40;--text:#e8e8f0;
+  --muted:#6b6b88;--accent:#f5c842;--accent2:#e8a020;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 18px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+h1{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);letter-spacing:2px;flex:1}
+.btn-group{display:flex;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.ctrl-group{display:flex;flex-direction:column;gap:3px}
+.ctrl-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+input[type=text],select{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:6px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;min-width:120px}
+input[type=text]:focus,select:focus{border-color:var(--accent)}
+.btn-clear{background:transparent;border:1px solid var(--border2);border-radius:7px;padding:6px 12px;color:var(--muted);font-size:12px;cursor:pointer}
+
+.tabs{display:flex;gap:2px;padding:10px 18px 0;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:7px 7px 0 0;border:1px solid transparent;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer}
+.tab.on{background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);color:var(--accent)}
+
+.content{padding:14px 18px}
+.stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 14px;min-width:100px}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent)}
+.stat-l{font-size:10px;color:var(--muted)}
+
+.grid{display:flex;flex-wrap:wrap;gap:10px}
+.cat-hdr{width:100%;margin:16px 0 8px;display:flex;align-items:center;gap:10px}
+.cat-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:4px}
+.cat-line{flex:1;height:1px;background:var(--border)}
+
+/* Card */
+.card{width:120px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;position:relative}
+.card-del{display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);background:rgba(200,30,30,.9);color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:700;padding:2px 8px;cursor:pointer;z-index:10;white-space:nowrap}
+.card:hover .card-del{display:block}
+.card-wrap{width:120px;height:168px;border-radius:8px;border:2px solid;overflow:hidden;position:relative;background:var(--surface2);transition:transform .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center}
+.card-wrap:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 12px 32px rgba(0,0,0,.6)}
+.card-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.card-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:6px}
+.card-placeholder .pi{font-size:28px}
+.card-placeholder .pn{font-size:9px;color:var(--muted);text-align:center;padding:0 6px;line-height:1.3}
+.b-cat{position:absolute;top:4px;left:4px;font-size:7px;font-weight:700;padding:2px 5px;border-radius:3px;color:#fff}
+.b-deck{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.88);color:var(--accent);font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.b-prio{position:absolute;top:4px;right:4px;font-size:10px;background:rgba(0,0,0,.75);padding:1px 4px;border-radius:3px}
+.b-tipo{position:absolute;bottom:4px;left:4px;font-size:8px;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(0,0,0,.82)}
+.b-new{position:absolute;top:22px;right:4px;background:var(--accent);color:#000;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px}
+.card-name{font-size:9px;text-align:center;color:#aaa;line-height:1.3;max-width:120px;word-break:break-word}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:999;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:min(360px,95vw);overflow:hidden;position:relative}
+.modal-img-wrap{width:100%;height:280px;background:#0a0a10;display:flex;align-items:center;justify-content:center;position:relative}
+.modal-img-wrap img{max-height:280px;max-width:100%;object-fit:contain;display:block}
+.modal-loading{font-size:12px;color:var(--muted)}
+.modal-close{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:2}
+.modal-info{padding:14px 18px}
+.modal-name{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);letter-spacing:1px;margin-bottom:8px}
+.modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.modal-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px}
+.modal-decks{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mbtn{flex:1;min-width:90px;padding:8px 10px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:none;text-align:center}
+.mbtn-upgrade{background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#000}
+.mbtn-delete{background:rgba(220,40,40,.15);color:#f87171;border:1px solid rgba(220,40,40,.3)!important}
+.mbtn-close{background:var(--surface2);color:var(--muted);border:1px solid var(--border2)!important}
+.version-picker{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.version-picker-label{font-size:10px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.version-grid{display:flex;flex-wrap:wrap;gap:6px;max-height:160px;overflow-y:auto}
+.vcard{width:72px;cursor:pointer;border:2px solid var(--border2);border-radius:6px;overflow:hidden;background:var(--surface2);transition:border-color .15s}
+.vcard:hover{border-color:var(--accent)}
+.vcard img{width:100%;display:block}
+.vcard-set{font-size:7px;color:#555;padding:2px 3px;text-align:center}
+
+/* Panel */
+.panel-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200}
+.panel-overlay.open{display:block}
+.panel{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);background:var(--surface);border-left:1px solid var(--border);z-index:201;overflow-y:auto;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.panel.open{transform:translateX(0)}
+.panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--surface);z-index:1}
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--accent);letter-spacing:1px;flex:1}
+.panel-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.panel-body{padding:18px}
+.mode-selector{display:flex;gap:8px;margin-bottom:18px}
+.mode-btn{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center}
+.mode-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(245,200,66,.08)}
+.mode-panel{display:none}.mode-panel.active{display:block}
+.form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.form-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.form-group input,.form-group select,.form-group textarea{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:7px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;outline:none}
+.form-group textarea{resize:vertical;line-height:1.6}
+.btn-confirm{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:8px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;width:100%;margin-top:4px}
+.btn-sm{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:9px 14px;color:var(--muted);font-size:12px;cursor:pointer}
+.action-row{display:flex;gap:8px;margin-top:12px}
+.action-row .btn-confirm{flex:1;margin-top:0}
+.status-box{display:none;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-top:10px}
+.status-box.show{display:block}
+.status-text{font-size:11px;color:var(--muted);margin-bottom:5px}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.info-box{background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.8}
+.detected-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.det-card{width:88px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--surface2);position:relative;cursor:default}
+.det-card.dup{border-color:#b45309}
+.det-card.skip{opacity:.35}
+.det-card img{width:100%;display:block}
+.det-no-img{height:66px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--surface)}
+.det-label{font-size:8px;padding:3px 4px;color:#aaa;text-align:center;line-height:1.3}
+.det-badge{position:absolute;top:3px;left:3px;font-size:7px;font-weight:700;padding:1px 4px;border-radius:3px;color:#fff}
+.det-skip-btn{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.7);color:#aaa;border:none;font-size:10px;border-radius:3px;cursor:pointer;padding:1px 4px}
+.search-results{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;max-height:280px;overflow-y:auto}
+.sr-card{width:82px;cursor:pointer;border:2px solid var(--border2);border-radius:7px;overflow:hidden;background:var(--surface2);transition:all .15s}
+.sr-card:hover,.sr-card.sel{border-color:var(--accent)}
+.sr-card.sel{box-shadow:0 0 10px rgba(245,200,66,.3)}
+.sr-card img{width:100%;display:block}
+.sr-name{font-size:8px;color:#aaa;padding:2px 3px;text-align:center;line-height:1.3}
+.sr-set{font-size:7px;color:#555;padding:0 3px 3px;text-align:center}
+.no-results{color:var(--muted);font-size:13px;padding:30px;text-align:center;width:100%}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2a1a;border:1px solid #4ade80;border-radius:10px;padding:10px 20px;color:#4ade80;font-size:13px;font-weight:600;z-index:9999;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>META POKÉMON TCG — CHEAT SHEET</h1>
+    <div class="btn-group">
+      <button class="btn-secondary" onclick="openPanel('deck')">📋 Importar deck</button>
+      <button class="btn-primary" onclick="openPanel('single')">＋ Agregar carta</button>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Buscar</span>
+      <input type="text" id="srch" placeholder="Nombre..." oninput="filter()">
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Categoría</span>
+      <select id="catf" onchange="filter()">
+        <option value="">Todas</option>
+        <option value="ex">EX / V</option>
+        <option value="basic">Básico</option>
+        <option value="supp">Supporter</option>
+        <option value="item">Item</option>
+        <option value="energy">Energía</option>
+        <option value="ace">ACE SPEC</option>
+        <option value="stadium">Stadium</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Tipo</span>
+      <select id="tipof" onchange="filter()">
+        <option value="">Todos</option>
+        <option value="ace">💎 ACE SPEC</option>
+<option value="dark">🌑 Oscuro</option>
+<option value="dragon">🐉 Dragón</option>
+<option value="fighting">👊 Lucha</option>
+<option value="fire">🔥 Fuego</option>
+<option value="grass">🌿 Hierba</option>
+<option value="lightning">⚡ Rayo</option>
+<option value="multi">✨ Especial</option>
+<option value="normal">⭐ Incoloro</option>
+<option value="psychic">🔮 Psíquico</option>
+<option value="stadium">🏟 Stadium</option>
+<option value="trainer">🎴 Trainer</option>
+<option value="water">💧 Agua</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Deck</span>
+      <select id="deckf" onchange="filter()">
+        <option value="">Todos</option>
+        <option value="Alakazam/Psíquico">Alakazam/Psíquico</option>
+<option value="Carvanha/Dark">Carvanha/Dark</option>
+<option value="Dusknoir/Psíquico">Dusknoir/Psíquico</option>
+<option value="Garchomp/Lucha">Garchomp/Lucha</option>
+<option value="Journey Together (nuevo)">Journey Together (nuevo)</option>
+<option value="Latias/Psíquico">Latias/Psíquico</option>
+<option value="Lucario/Lucha">Lucario/Lucha</option>
+<option value="Marnie's Grimmsnarl">Marnie's Grimmsnarl</option>
+<option value="Meganium v2">Meganium v2</option>
+<option value="Meganium/Planta">Meganium/Planta</option>
+<option value="Munkidori/Multi">Munkidori/Multi</option>
+<option value="Okidogi/Lucha">Okidogi/Lucha</option>
+<option value="Okidogi/Lucha v2">Okidogi/Lucha v2</option>
+<option value="Rillaboom/Planta">Rillaboom/Planta</option>
+<option value="Slowking/Psíquico">Slowking/Psíquico</option>
+<option value="TR Murkrow/Dark">TR Murkrow/Dark</option>
+<option value="Team Rocket">Team Rocket</option>
+<option value="Toedscruel/Planta">Toedscruel/Planta</option>
+<option value="Varios">Varios</option>
+<option value="Zoroark/Dark">Zoroark/Dark</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Prioridad</span>
+      <select id="priof" onchange="filter()">
+        <option value="">Toda</option>
+        <option value="🔴">🔴 Crítica</option>
+        <option value="🟠">🟠 Alta</option>
+        <option value="🟡">🟡 Media</option>
+        <option value="🟢">🟢 Normal</option>
+      </select>
+    </div>
+    <button class="btn-clear" onclick="clearFilters()">✕</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab on" onclick="showTab('all',this)">Todas</button>
+  <button class="tab" onclick="showTab('prio',this)">🔴 Prioritarias</button>
+  <button class="tab" onclick="showTab('pokemon',this)">Pokémon</button>
+  <button class="tab" onclick="showTab('trainers',this)">Trainers</button>
+  <button class="tab" onclick="showTab('energies',this)">Energías</button>
+  <button class="tab" onclick="showTab('ace',this)">ACE / Stadium</button>
+  <button class="tab" onclick="showTab('new',this)">✨ Nuevas</button>
+</div>
+
+<div class="content">
+  <div class="stats">
+    <div class="stat"><div class="stat-n">20</div><div class="stat-l">Decks</div></div>
+    <div class="stat"><div class="stat-n" id="total-n">205</div><div class="stat-l">Cartas únicas</div></div>
+    <div class="stat"><div class="stat-n" id="vis-n">205</div><div class="stat-l">Mostrando</div></div>
+    <div class="stat"><div class="stat-n">18x</div><div class="stat-l">Poké Pad</div></div>
+  </div>
+  <div id="grid" class="grid"></div>
+</div>
+
+<!-- Modal detalle -->
+<div class="modal" id="modal" onclick="handleModalBg(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-img-wrap" id="mImgWrap">
+      <span class="modal-loading" id="mLoading">Cargando imagen...</span>
+    </div>
+    <div class="modal-info">
+      <div class="modal-name" id="mName"></div>
+      <div class="modal-tags" id="mTags"></div>
+      <div class="modal-decks" id="mDecks"></div>
+      <div class="modal-actions">
+        <button class="mbtn mbtn-upgrade" onclick="startUpgrade()">🔄 Cambiar versión</button>
+        <button class="mbtn mbtn-delete" onclick="deleteCard()">🗑 Eliminar</button>
+        <button class="mbtn mbtn-close" onclick="closeModal()">Cerrar</button>
+      </div>
+      <div class="version-picker" id="versionPicker" style="display:none">
+        <div class="version-picker-label">Elige la versión de la carta:</div>
+        <div class="version-grid" id="versionGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panel lateral -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <div class="panel-title" id="panelTitle">Agregar</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="mode-selector">
+      <button class="mode-btn active" id="mBtn1" onclick="setMode('single')">＋ Carta individual</button>
+      <button class="mode-btn" id="mBtn2" onclick="setMode('deck')">📋 Importar deck</button>
+    </div>
+
+    <!-- Carta individual -->
+    <div class="mode-panel active" id="modeSingle">
+      <div class="form-group">
+        <span class="form-label">Buscar por nombre</span>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="sSearch" placeholder="Ej: Charizard ex..." style="flex:1" onkeydown="if(event.key==='Enter')searchSingle()">
+          <button class="btn-sm" onclick="searchSingle()">Buscar</button>
+        </div>
+      </div>
+      <div id="sStatus" style="font-size:11px;color:var(--muted);margin-bottom:8px"></div>
+      <div class="search-results" id="sResults"></div>
+      <div id="sForm" style="display:none">
+        <div style="height:1px;background:var(--border);margin:12px 0"></div>
+        <div style="font-size:11px;color:#4ade80;font-weight:600;margin-bottom:10px">✅ Seleccionada — completa los datos:</div>
+        <div style="display:flex;gap:8px">
+          <div class="form-group" style="flex:2">
+            <span class="form-label">Nombre</span>
+            <input type="text" id="sName">
+          </div>
+          <div class="form-group" style="flex:1">
+            <span class="form-label">Categoría</span>
+            <select id="sCat">
+              <option value="ex">EX/V</option><option value="basic">Básico</option>
+              <option value="supp">Supporter</option><option value="item">Item</option>
+              <option value="energy">Energía</option><option value="ace">ACE</option>
+              <option value="stadium">Stadium</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="form-group" style="flex:1">
+            <span class="form-label">Tipo (color carta)</span>
+            <select id="sTipo">
+              <option value="grass">🌿 Hierba</option><option value="water">💧 Agua</option>
+              <option value="psychic">🔮 Psíquico</option><option value="dark">🌑 Oscuro</option>
+              <option value="fighting">👊 Lucha</option><option value="fire">🔥 Fuego</option>
+              <option value="lightning">⚡ Rayo</option><option value="normal">⭐ Incoloro</option>
+              <option value="dragon">🐉 Dragón</option><option value="multi">✨ Especial</option>
+              <option value="trainer">🎴 Trainer</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1">
+            <span class="form-label">Veces en meta</span>
+            <input type="number" id="sDecks" value="1" min="1" max="20">
+          </div>
+        </div>
+        <div class="form-group">
+          <span class="form-label">Deck / Mazo</span>
+          <input type="text" id="sDeck" placeholder="Ej: Meganium/Planta">
+        </div>
+        <button class="btn-confirm" onclick="confirmSingle()">✅ Agregar al cheat sheet</button>
+      </div>
+    </div>
+
+    <!-- Importar deck -->
+    <div class="mode-panel" id="modeDeck">
+      <div id="dStep1">
+        <div class="info-box">
+          <span style="color:var(--accent);font-weight:700">💡 Cómo usar:</span><br>
+          Manda la foto del deck al chat de Claude → te da la lista de nombres → pégala aquí.
+        </div>
+        <div class="form-group">
+          <span class="form-label">Nombre del deck</span>
+          <input type="text" id="dLabel" placeholder="Ej: Lucario/Lucha">
+        </div>
+        <div class="form-group">
+          <span class="form-label">Lista de cartas (separadas por coma o línea)</span>
+          <textarea id="dList" rows="8" placeholder="Chikorita, Bayleef, Meganium, Boss's Orders, Ultra Ball, Poke Pad..."></textarea>
+        </div>
+        <button class="btn-confirm" onclick="processDeck()">🔍 Buscar imágenes</button>
+        <div class="status-box" id="dStatus">
+          <div class="status-text" id="dStatusText"></div>
+          <div class="progress-bar"><div class="progress-fill" id="dProgress" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div id="dStep2" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <button onclick="dBackToStep1()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px">←</button>
+          <span style="font-size:13px;font-weight:700">Confirmar cartas</span>
+        </div>
+        <div id="dInfo" style="font-size:11px;color:var(--muted);margin-bottom:10px"></div>
+        <div class="detected-grid" id="dGrid"></div>
+        <div class="action-row">
+          <button class="btn-confirm" onclick="confirmDeck()">✅ Agregar al cheat sheet</button>
+          <button class="btn-sm" onclick="dBackToStep1()">↩ Editar lista</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TYPE_MAP = {grass:'grass',fire:'fire',water:'water',lightning:'lightning',fighting:'fighting',psychic:'psychic',darkness:'dark',dragon:'dragon',colorless:'normal',metal:'normal',fairy:'psychic'};
+const CAT = {
+  ex:{bg:'#1a0535',border:'#c084fc',badge:'#7c3aed',label:'EX / V'},
+  basic:{bg:'#0a1628',border:'#60a5fa',badge:'#1d4ed8',label:'Básico'},
+  supp:{bg:'#0f1f0f',border:'#4ade80',badge:'#15803d',label:'Supporter'},
+  item:{bg:'#1a1207',border:'#fbbf24',badge:'#b45309',label:'Item'},
+  energy:{bg:'#0f0f0f',border:'#94a3b8',badge:'#475569',label:'Energía'},
+  ace:{bg:'#200010',border:'#f472b6',badge:'#be185d',label:'ACE SPEC'},
+  stadium:{bg:'#001a1a',border:'#2dd4bf',badge:'#0f766e',label:'Stadium'},
+};
+const TIPO = {
+  grass:{c:'#4ade80',i:'🌿'},water:{c:'#38bdf8',i:'💧'},psychic:{c:'#c084fc',i:'🔮'},
+  dark:{c:'#94a3b8',i:'🌑'},fighting:{c:'#c97c3a',i:'👊'},fire:{c:'#fb923c',i:'🔥'},
+  lightning:{c:'#facc15',i:'⚡'},normal:{c:'#e2e8f0',i:'⭐'},dragon:{c:'#86a05a',i:'🐉'},
+  multi:{c:'#f472b6',i:'✨'},trainer:{c:'#60a5fa',i:'🎴'},ace:{c:'#f472b6',i:'💎'},
+  stadium:{c:'#2dd4bf',i:'🏟'},energy:{c:'#a78bfa',i:'⚡'},
+};
+const CAT_ORDER = ['ex','basic','supp','item','energy','ace','stadium'];
+
+function prio(n){return n>=14?'🔴':n>=8?'🟠':n>=5?'🟡':'🟢';}
+function getLocal(){try{return JSON.parse(localStorage.getItem('ptcg_meta')||'[]');}catch{return [];}}
+function saveLocal(a){localStorage.setItem('ptcg_meta',JSON.stringify(a));}
+function getNameIdx(){return new Set(ALL_DATA.map(d=>d.name.toLowerCase().trim()));}
+
+// Image cache
+const IMG_CACHE = {};
+async function getCardImg(name){
+  if(IMG_CACHE[name]) return IMG_CACHE[name];
+  try{
+    const r = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(name)}"&pageSize=1&orderBy=-set.releaseDate&select=images`);
+    const d = await r.json();
+    const url = d.data?.[0]?.images?.large || d.data?.[0]?.images?.small || '';
+    IMG_CACHE[name] = url;
+    return url;
+  }catch{return '';}
+}
+
+// Base data (no images)
+const BASE = [{"name": "Poké Pad", "cat": "item", "tipo": "trainer", "decks": 18, "decksList": ["Lucario/Lucha", "Meganium/Planta", "Meganium v2", "Marnie's Grimmsnarl", "Alakazam/Psíquico", "Zoroark/Dark", "Team Rocket", "Garchomp/Lucha", "TR Murkrow/Dark", "Munkidori/Multi", "Okidogi/Lucha", "Rillaboom/Planta", "Dusknoir/Psíquico", "Latias/Psíquico", "Slowking/Psíquico", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Boss's Orders", "cat": "supp", "tipo": "trainer", "decks": 17, "decksList": ["Lucario/Lucha", "Meganium/Planta", "Meganium v2", "Marnie's Grimmsnarl", "Alakazam/Psíquico", "Zoroark/Dark", "Team Rocket", "Garchomp/Lucha", "TR Murkrow/Dark", "Munkidori/Multi", "Okidogi/Lucha", "Rillaboom/Planta", "Dusknoir/Psíquico", "Latias/Psíquico", "Slowking/Psíquico", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Night Stretcher", "cat": "item", "tipo": "trainer", "decks": 17, "decksList": ["Lucario/Lucha", "Meganium/Planta", "Meganium v2", "Marnie's Grimmsnarl", "Alakazam/Psíquico", "Zoroark/Dark", "Team Rocket", "Garchomp/Lucha", "TR Murkrow/Dark", "Munkidori/Multi", "Okidogi/Lucha", "Rillaboom/Planta", "Dusknoir/Psíquico", "Latias/Psíquico", "Slowking/Psíquico", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Lillie's Determination", "cat": "supp", "tipo": "trainer", "decks": 16, "decksList": ["Lucario/Lucha", "Meganium/Planta", "Meganium v2", "Marnie's Grimmsnarl", "Alakazam/Psíquico", "Zoroark/Dark", "Team Rocket", "Garchomp/Lucha", "Munkidori/Multi", "Okidogi/Lucha", "Rillaboom/Planta", "Dusknoir/Psíquico", "Latias/Psíquico", "Slowking/Psíquico", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Ultra Ball", "cat": "item", "tipo": "trainer", "decks": 14, "decksList": ["Lucario/Lucha", "Meganium/Planta", "Meganium v2", "Alakazam/Psíquico", "Zoroark/Dark", "Team Rocket", "TR Murkrow/Dark", "Munkidori/Multi", "Rillaboom/Planta", "Dusknoir/Psíquico", "Latias/Psíquico", "Slowking/Psíquico", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Buddy-Buddy Poffin", "cat": "item", "tipo": "trainer", "decks": 10, "decksList": ["Marnie's Grimmsnarl", "Alakazam/Psíquico", "Zoroark/Dark", "Garchomp/Lucha", "Rillaboom/Planta", "Munkidori/Multi", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Judge", "cat": "supp", "tipo": "trainer", "decks": 9, "decksList": ["Lucario/Lucha", "Meganium/Planta", "Meganium v2", "Alakazam/Psíquico", "Zoroark/Dark", "Garchomp/Lucha", "Rillaboom/Planta", "Latias/Psíquico", "Carvanha/Dark"]}, {"name": "Fezandipiti ex", "cat": "ex", "tipo": "psychic", "decks": 9, "decksList": ["Meganium/Planta", "Meganium v2", "Alakazam/Psíquico", "Zoroark/Dark", "Munkidori/Multi", "Latias/Psíquico", "Carvanha/Dark", "Toedscruel/Planta"]}, {"name": "Unfair Stamp", "cat": "ace", "tipo": "ace", "decks": 7, "decksList": ["Marnie's Grimmsnarl", "Zoroark/Dark", "Garchomp/Lucha", "Munkidori/Multi", "Rillaboom/Planta", "Carvanha/Dark"]}, {"name": "Munkidori", "cat": "ex", "tipo": "psychic", "decks": 7, "decksList": ["Marnie's Grimmsnarl", "Zoroark/Dark", "Munkidori/Multi", "Okidogi/Lucha", "Dusknoir/Psíquico", "Carvanha/Dark"]}, {"name": "Basic Dark Energy", "cat": "energy", "tipo": "dark", "decks": 7, "decksList": ["Marnie's Grimmsnarl", "Zoroark/Dark", "Munkidori/Multi", "TR Murkrow/Dark", "Dusknoir/Psíquico", "Carvanha/Dark"]}, {"name": "Air Balloon", "cat": "item", "tipo": "trainer", "decks": 6, "decksList": ["Meganium/Planta", "Alakazam/Psíquico", "Rillaboom/Planta", "Okidogi/Lucha", "Carvanha/Dark"]}, {"name": "Nyarth ex JP", "cat": "ex", "tipo": "normal", "decks": 6, "decksList": ["Meganium/Planta", "Meganium v2", "Dusknoir/Psíquico", "Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Budew", "cat": "basic", "tipo": "grass", "decks": 6, "decksList": ["Meganium/Planta", "Meganium v2", "Marnie's Grimmsnarl", "Zoroark/Dark", "Dusknoir/Psíquico", "Toedscruel/Planta"]}, {"name": "Basic Grass Energy", "cat": "energy", "tipo": "grass", "decks": 6, "decksList": ["Meganium/Planta", "Meganium v2", "Team Rocket", "Munkidori/Multi", "Rillaboom/Planta", "Toedscruel/Planta"]}, {"name": "Basic Psychic Energy", "cat": "energy", "tipo": "psychic", "decks": 6, "decksList": ["Alakazam/Psíquico", "Team Rocket", "Munkidori/Multi", "Latias/Psíquico", "Dusknoir/Psíquico", "Slowking/Psíquico"]}, {"name": "Lana's Aid", "cat": "supp", "tipo": "trainer", "decks": 5, "decksList": ["Meganium/Planta", "Alakazam/Psíquico", "Munkidori/Multi", "Rillaboom/Planta", "Slowking/Psíquico"]}, {"name": "Bug Catching Set", "cat": "item", "tipo": "trainer", "decks": 5, "decksList": ["Meganium/Planta", "Meganium v2", "Team Rocket", "Rillaboom/Planta"]}, {"name": "Rare Candy", "cat": "item", "tipo": "trainer", "decks": 5, "decksList": ["Marnie's Grimmsnarl", "Alakazam/Psíquico", "Garchomp/Lucha", "Latias/Psíquico", "Dusknoir/Psíquico"]}, {"name": "Hilda", "cat": "supp", "tipo": "trainer", "decks": 5, "decksList": ["Alakazam/Psíquico", "Garchomp/Lucha", "Latias/Psíquico", "Dusknoir/Psíquico", "Slowking/Psíquico"]}, {"name": "Switch", "cat": "item", "tipo": "trainer", "decks": 4, "decksList": ["Lucario/Lucha", "Garchomp/Lucha", "Dusknoir/Psíquico", "Rillaboom/Planta"]}, {"name": "Basic Fighting Energy", "cat": "energy", "tipo": "fighting", "decks": 4, "decksList": ["Lucario/Lucha", "Okidogi/Lucha", "Munkidori/Multi"]}, {"name": "Ogerpon ex", "cat": "ex", "tipo": "grass", "decks": 4, "decksList": ["Meganium/Planta", "Meganium v2", "Munkidori/Multi", "Toedscruel/Planta"]}, {"name": "Morty's Conviction", "cat": "supp", "tipo": "trainer", "decks": 4, "decksList": ["Meganium v2", "Marnie's Grimmsnarl", "Munkidori/Multi", "Okidogi/Lucha"]}, {"name": "Telepass Energy JP", "cat": "energy", "tipo": "psychic", "decks": 4, "decksList": ["Alakazam/Psíquico", "Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "TR Petrel", "cat": "supp", "tipo": "trainer", "decks": 4, "decksList": ["Varios"]}, {"name": "Energy Switch", "cat": "item", "tipo": "trainer", "decks": 4, "decksList": ["Team Rocket", "Munkidori/Multi", "Carvanha/Dark"]}, {"name": "Latias ex", "cat": "ex", "tipo": "psychic", "decks": 4, "decksList": ["Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Carmine", "cat": "supp", "tipo": "trainer", "decks": 3, "decksList": ["Lucario/Lucha", "Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Wally's Compassion", "cat": "supp", "tipo": "trainer", "decks": 3, "decksList": ["Lucario/Lucha", "Meganium v2", "Dusknoir/Psíquico"]}, {"name": "Fighting Gong", "cat": "item", "tipo": "trainer", "decks": 3, "decksList": ["Lucario/Lucha", "Garchomp/Lucha", "Okidogi/Lucha"]}, {"name": "Tatsugiri", "cat": "basic", "tipo": "psychic", "decks": 3, "decksList": ["Marnie's Grimmsnarl", "Carvanha/Dark"]}, {"name": "Psyduck", "cat": "basic", "tipo": "water", "decks": 3, "decksList": ["Alakazam/Psíquico", "Rillaboom/Planta", "Dusknoir/Psíquico"]}, {"name": "Enriching Energy", "cat": "ace", "tipo": "multi", "decks": 3, "decksList": ["Alakazam/Psíquico", "Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Pecharunt ex", "cat": "ex", "tipo": "dark", "decks": 3, "decksList": ["Zoroark/Dark", "Carvanha/Dark"]}, {"name": "TR Articuno", "cat": "basic", "tipo": "water", "decks": 3, "decksList": ["Team Rocket", "TR Murkrow/Dark", "Munkidori/Multi"]}, {"name": "TR Watchtower", "cat": "stadium", "tipo": "stadium", "decks": 3, "decksList": ["Garchomp/Lucha", "Carvanha/Dark"]}, {"name": "Ignition Energy", "cat": "energy", "tipo": "fire", "decks": 3, "decksList": ["TR Murkrow/Dark", "Dusknoir/Psíquico", "Latias/Psíquico"]}, {"name": "Pokégear 3.0", "cat": "item", "tipo": "trainer", "decks": 3, "decksList": ["Munkidori/Multi", "Okidogi/Lucha", "Dusknoir/Psíquico"]}, {"name": "Duskull", "cat": "basic", "tipo": "psychic", "decks": 3, "decksList": ["Dusknoir/Psíquico", "Latias/Psíquico"]}, {"name": "Dusclops", "cat": "basic", "tipo": "psychic", "decks": 3, "decksList": ["Dusknoir/Psíquico", "Latias/Psíquico"]}, {"name": "Dusknoir", "cat": "basic", "tipo": "psychic", "decks": 3, "decksList": ["Dusknoir/Psíquico", "Latias/Psíquico"]}, {"name": "Wondrous Patch", "cat": "item", "tipo": "trainer", "decks": 3, "decksList": ["Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Solrock", "cat": "basic", "tipo": "fighting", "decks": 2, "decksList": ["Lucario/Lucha", "Okidogi/Lucha"]}, {"name": "Lunatone", "cat": "basic", "tipo": "psychic", "decks": 2, "decksList": ["Lucario/Lucha", "Okidogi/Lucha"]}, {"name": "Premium Power Pro", "cat": "item", "tipo": "trainer", "decks": 2, "decksList": ["Lucario/Lucha", "Garchomp/Lucha"]}, {"name": "Maximum Belt", "cat": "ace", "tipo": "ace", "decks": 2, "decksList": ["Lucario/Lucha", "Team Rocket"]}, {"name": "Gravity Mountain", "cat": "stadium", "tipo": "stadium", "decks": 2, "decksList": ["Lucario/Lucha", "Carvanha/Dark"]}, {"name": "Chikorita", "cat": "basic", "tipo": "grass", "decks": 2, "decksList": ["Meganium/Planta", "Meganium v2"]}, {"name": "Bayleef", "cat": "basic", "tipo": "grass", "decks": 2, "decksList": ["Meganium/Planta", "Meganium v2"]}, {"name": "Meganium", "cat": "basic", "tipo": "grass", "decks": 2, "decksList": ["Meganium/Planta", "Meganium v2"]}, {"name": "Dawn", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Meganium/Planta", "Alakazam/Psíquico"]}, {"name": "Forest of Vitality", "cat": "stadium", "tipo": "stadium", "decks": 2, "decksList": ["Meganium/Planta", "Meganium v2"]}, {"name": "Xerosic's Machinations", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Meganium v2", "Munkidori/Multi"]}, {"name": "Shaymin", "cat": "basic", "tipo": "grass", "decks": 2, "decksList": ["Alakazam/Psíquico", "Rillaboom/Planta"]}, {"name": "Battle Cage", "cat": "stadium", "tipo": "stadium", "decks": 2, "decksList": ["Alakazam/Psíquico", "Okidogi/Lucha"]}, {"name": "Black Belt's Training", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Zoroark/Dark", "Rillaboom/Planta"]}, {"name": "Binding Mochi", "cat": "stadium", "tipo": "stadium", "decks": 2, "decksList": ["Zoroark/Dark", "Carvanha/Dark"]}, {"name": "Lillie's Clefairy ex", "cat": "ex", "tipo": "psychic", "decks": 2, "decksList": ["Team Rocket", "Latias/Psíquico"]}, {"name": "TR Ariana", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "TR Proton", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "TR Giovanni", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "TR Archer", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "TR Transceiver", "cat": "item", "tipo": "trainer", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "TR Factory", "cat": "stadium", "tipo": "stadium", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "TR's Energy", "cat": "energy", "tipo": "dark", "decks": 2, "decksList": ["Team Rocket", "TR Murkrow/Dark"]}, {"name": "Prism Energy", "cat": "energy", "tipo": "multi", "decks": 2, "decksList": ["Munkidori/Multi", "Okidogi/Lucha"]}, {"name": "Energy Retrieval", "cat": "item", "tipo": "trainer", "decks": 2, "decksList": ["Okidogi/Lucha", "Toedscruel/Planta"]}, {"name": "Legacy Energy", "cat": "ace", "tipo": "multi", "decks": 2, "decksList": ["Okidogi/Lucha", "Toedscruel/Planta"]}, {"name": "Colress's Tenacity", "cat": "supp", "tipo": "trainer", "decks": 2, "decksList": ["Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Mystery Garden", "cat": "stadium", "tipo": "stadium", "decks": 2, "decksList": ["Latias/Psíquico", "Slowking/Psíquico"]}, {"name": "Toxel", "cat": "basic", "tipo": "lightning", "decks": 2, "decksList": ["Carvanha/Dark"]}, {"name": "Toxtricity", "cat": "basic", "tipo": "lightning", "decks": 2, "decksList": ["Carvanha/Dark"]}, {"name": "Riolu", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Lucario/Lucha"]}, {"name": "Mega Lucario ex", "cat": "ex", "tipo": "fighting", "decks": 1, "decksList": ["Lucario/Lucha"]}, {"name": "Makuhita", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Lucario/Lucha"]}, {"name": "Hariyama", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Lucario/Lucha"]}, {"name": "Tool Scrapper", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Lucario/Lucha"]}, {"name": "Smoliv", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Meganium/Planta"]}, {"name": "Dolliv", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Meganium/Planta"]}, {"name": "Arboliva ex", "cat": "ex", "tipo": "grass", "decks": 1, "decksList": ["Meganium/Planta"]}, {"name": "Bulbasaur", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Ivysaur", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Mega Venusaur ex", "cat": "ex", "tipo": "grass", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Gardevoir ex", "cat": "ex", "tipo": "psychic", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Regigigas", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Celebi", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Max Rod", "cat": "ace", "tipo": "ace", "decks": 1, "decksList": ["Meganium v2"]}, {"name": "Marnie's Impidimp", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Marnie's Grimmsnarl"]}, {"name": "Marnie's Morgrem", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Marnie's Grimmsnarl"]}, {"name": "Marnie's Grimmsnarl ex", "cat": "ex", "tipo": "dark", "decks": 1, "decksList": ["Marnie's Grimmsnarl"]}, {"name": "Snorunt", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Marnie's Grimmsnarl"]}, {"name": "Froslass", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Marnie's Grimmsnarl"]}, {"name": "Team Rocket's Petrel", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Marnie's Grimmsnarl", "Garchomp/Lucha", "Team Rocket", "TR Murkrow/Dark", "Munkidori/Multi", "Okidogi/Lucha"]}, {"name": "Spikemuth Gym", "cat": "stadium", "tipo": "stadium", "decks": 1, "decksList": ["Marnie's Grimmsnarl"]}, {"name": "Abra", "cat": "basic", "tipo": "psychic", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Kadabra", "cat": "basic", "tipo": "psychic", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Alakazam", "cat": "basic", "tipo": "psychic", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Dunsparce", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Dudunsparce", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Fan Rotom", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Genesect", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Enhanced Hammer", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "Sacred Ash", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Alakazam/Psíquico"]}, {"name": "N's Zorua", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's Zoroark ex", "cat": "ex", "tipo": "dark", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's Darumaka", "cat": "basic", "tipo": "fire", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's Darmanitan", "cat": "basic", "tipo": "fire", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's Zekrom", "cat": "basic", "tipo": "lightning", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's Reshiram", "cat": "basic", "tipo": "fire", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "Cyrano", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "Janine's Secret Art", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's PP Up", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "N's Castle", "cat": "stadium", "tipo": "stadium", "decks": 1, "decksList": ["Zoroark/Dark"]}, {"name": "TR Tarountula", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Team Rocket"]}, {"name": "TR Spidops", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Team Rocket"]}, {"name": "TR Mewtwo ex", "cat": "ex", "tipo": "psychic", "decks": 1, "decksList": ["Team Rocket"]}, {"name": "TR Mimikyu", "cat": "basic", "tipo": "psychic", "decks": 1, "decksList": ["Team Rocket"]}, {"name": "Cynthia's Gible", "cat": "basic", "tipo": "dragon", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "Cynthia's Gabite", "cat": "basic", "tipo": "dragon", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "Cynthia's Garchomp ex", "cat": "ex", "tipo": "dragon", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "Cynthia's Roselia", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "Cynthia's Roserade", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "Cynthia's Spiritomb", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "Cynthia's Power Weight", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Garchomp/Lucha"]}, {"name": "TR Murkrow", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["TR Murkrow/Dark"]}, {"name": "TR Honchkrow", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["TR Murkrow/Dark"]}, {"name": "TR Porygon", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["TR Murkrow/Dark"]}, {"name": "TR Porygon2", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["TR Murkrow/Dark"]}, {"name": "Roto-Stick", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["TR Murkrow/Dark"]}, {"name": "Miracle Headset", "cat": "ace", "tipo": "ace", "decks": 1, "decksList": ["TR Murkrow/Dark"]}, {"name": "Dwebble", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Munkidori/Multi"]}, {"name": "Crustle", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Munkidori/Multi"]}, {"name": "Crispin", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Munkidori/Multi"]}, {"name": "Hero's Cape", "cat": "ace", "tipo": "ace", "decks": 1, "decksList": ["Munkidori/Multi"]}, {"name": "Mist Energy", "cat": "energy", "tipo": "psychic", "decks": 1, "decksList": ["Munkidori/Multi"]}, {"name": "Okidogi", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Okidogi/Lucha"]}, {"name": "Kametch JP", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Okidogi/Lucha"]}, {"name": "Kamenutsu ex JP", "cat": "ex", "tipo": "fighting", "decks": 1, "decksList": ["Okidogi/Lucha"]}, {"name": "Ursaluna ex", "cat": "ex", "tipo": "normal", "decks": 1, "decksList": ["Okidogi/Lucha"]}, {"name": "Dragon Trainer JP", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Okidogi/Lucha"]}, {"name": "Applin", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Dipplin", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Grookey", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Thwackey", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Rillaboom", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Goldeen", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Seaking", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Brock's Scouting", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Kieran", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Brave Bangle", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Festival Grounds", "cat": "stadium", "tipo": "stadium", "decks": 1, "decksList": ["Rillaboom/Planta"]}, {"name": "Hitodeman JP", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Dusknoir/Psíquico"]}, {"name": "Mega Starmie ex JP", "cat": "ex", "tipo": "water", "decks": 1, "decksList": ["Dusknoir/Psíquico"]}, {"name": "Prime Catcher", "cat": "ace", "tipo": "ace", "decks": 1, "decksList": ["Dusknoir/Psíquico"]}, {"name": "Risky Ruins", "cat": "stadium", "tipo": "stadium", "decks": 1, "decksList": ["Dusknoir/Psíquico", "Latias/Psíquico"]}, {"name": "Basic Water Energy", "cat": "energy", "tipo": "water", "decks": 1, "decksList": ["Dusknoir/Psíquico"]}, {"name": "Frillish", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Latias/Psíquico"]}, {"name": "Jellicent ex", "cat": "ex", "tipo": "water", "decks": 1, "decksList": ["Latias/Psíquico"]}, {"name": "Mega Blissey ex", "cat": "ex", "tipo": "psychic", "decks": 1, "decksList": ["Latias/Psíquico"]}, {"name": "Flutter Mane", "cat": "basic", "tipo": "psychic", "decks": 1, "decksList": ["Latias/Psíquico"]}, {"name": "Secret Box", "cat": "ace", "tipo": "ace", "decks": 1, "decksList": ["Latias/Psíquico"]}, {"name": "Powerglass", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Latias/Psíquico"]}, {"name": "Slowpoke", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Slowking", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Kyurem", "cat": "basic", "tipo": "water", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Smoochum", "cat": "basic", "tipo": "psychic", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Annihilape", "cat": "basic", "tipo": "fighting", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Haxorus", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Zeraora", "cat": "basic", "tipo": "lightning", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Surfer", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Ciphermaniac's Coding", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Academy at Night", "cat": "stadium", "tipo": "stadium", "decks": 1, "decksList": ["Slowking/Psíquico"]}, {"name": "Mega Absol ex", "cat": "ex", "tipo": "dark", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "TR Sneasel", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Palafin ex", "cat": "ex", "tipo": "water", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Larry's Skill", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Hassel", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Lacey", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Iris's Fighting Spirit", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Energy Recycler", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Carvanha", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Mega Sharpedo ex", "cat": "ex", "tipo": "dark", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Buneary", "cat": "basic", "tipo": "normal", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Mega Lopunny ex", "cat": "ex", "tipo": "lightning", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Yveltal", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Explorer's Guidance", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Mega Signal", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Carvanha/Dark"]}, {"name": "Toedscool", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Toedscruel ex", "cat": "ex", "tipo": "grass", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Toedscruel", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Mew ex", "cat": "ex", "tipo": "psychic", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Pinsir", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Iono", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Professor's Research", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Nest Ball", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Earthen Vessel", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Super Rod", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Pal Pad", "cat": "item", "tipo": "trainer", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Area Zero Underdepths", "cat": "stadium", "tipo": "stadium", "decks": 1, "decksList": ["Toedscruel/Planta"]}, {"name": "Ogerpon ex (Cornerstone)", "cat": "ex", "tipo": "fighting", "decks": 1, "decksList": ["Okidogi/Lucha v2"]}, {"name": "Ting-Lu", "cat": "basic", "tipo": "dark", "decks": 1, "decksList": ["Okidogi/Lucha v2"]}, {"name": "Tarragon", "cat": "supp", "tipo": "trainer", "decks": 1, "decksList": ["Okidogi/Lucha v2"]}, {"name": "Rocky Fighting Energy", "cat": "energy", "tipo": "fighting", "decks": 1, "decksList": ["Okidogi/Lucha v2"]}, {"name": "Lilligant", "cat": "basic", "tipo": "grass", "decks": 1, "decksList": ["Journey Together (nuevo)"]}];
+const LOCAL = getLocal();
+let ALL_DATA = [...BASE, ...LOCAL];
+let currentTab = 'all';
+let currentCard = null;
+let currentIdx = -1;
+
+// Lazy load images in grid
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const wrap = entry.target;
+      const name = wrap.dataset.name;
+      if(!name || wrap.dataset.loaded) return;
+      wrap.dataset.loaded = '1';
+      observer.unobserve(wrap);
+      getCardImg(name).then(url => {
+        if(!url) return;
+        const ph = wrap.querySelector('.card-placeholder');
+        if(ph){
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = name;
+          wrap.replaceChild(img, ph);
+        }
+      });
+    }
+  });
+}, {rootMargin:'200px'});
+
+function showTab(t,btn){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  filter();
+}
+function clearFilters(){
+  document.getElementById('srch').value='';
+  ['catf','tipof','deckf','priof'].forEach(id=>document.getElementById(id).value='');
+  filter();
+}
+function filter(){
+  const srch=document.getElementById('srch').value.toLowerCase().trim();
+  const catf=document.getElementById('catf').value;
+  const tipof=document.getElementById('tipof').value;
+  const deckf=document.getElementById('deckf').value;
+  const priof=document.getElementById('priof').value;
+  let data=ALL_DATA.filter(d=>{
+    if(srch&&!d.name.toLowerCase().includes(srch))return false;
+    if(catf&&d.cat!==catf)return false;
+    if(tipof&&d.tipo!==tipof)return false;
+    if(deckf&&!(d.decksList||[]).includes(deckf))return false;
+    if(priof&&prio(d.decks)!==priof)return false;
+    if(currentTab==='prio'&&prio(d.decks)!=='🔴'&&prio(d.decks)!=='🟠')return false;
+    if(currentTab==='pokemon'&&d.cat!=='ex'&&d.cat!=='basic')return false;
+    if(currentTab==='trainers'&&d.cat!=='supp'&&d.cat!=='item')return false;
+    if(currentTab==='energies'&&d.cat!=='energy')return false;
+    if(currentTab==='ace'&&d.cat!=='ace'&&d.cat!=='stadium')return false;
+    if(currentTab==='new'&&!d.isExtra)return false;
+    return true;
+  });
+  document.getElementById('vis-n').textContent=data.length;
+  renderGrid(data);
+}
+
+function renderGrid(data){
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  if(!data.length){grid.innerHTML='<div class="no-results">Sin resultados.</div>';return;}
+  const groups={};
+  data.forEach(d=>{(groups[d.cat]=groups[d.cat]||[]).push(d);});
+  CAT_ORDER.forEach(cat=>{
+    if(!groups[cat]?.length)return;
+    const cc=CAT[cat]||CAT.basic;
+    const hdr=document.createElement('div');
+    hdr.className='cat-hdr';
+    hdr.innerHTML=`<span class="cat-title" style="background:${cc.badge}22;color:${cc.border};border:1px solid ${cc.border}44">${cc.label} · ${groups[cat].length}</span><div class="cat-line"></div>`;
+    grid.appendChild(hdr);
+    groups[cat].forEach(d=>{
+      const cc2=CAT[d.cat]||CAT.basic;
+      const tc=TIPO[d.tipo]||TIPO.normal;
+      const idx=ALL_DATA.indexOf(d);
+      const el=document.createElement('div');
+      el.className='card';
+      el.innerHTML=`
+        <button class="card-del" onclick="event.stopPropagation();quickDel(${idx})">✕ Eliminar</button>
+        <div class="card-wrap" data-name="${d.name}" style="border-color:${d.isExtra?'#f5c842':cc2.border};background:${cc2.bg}" onclick="openModal(${idx})">
+          <div class="card-placeholder">
+            <span class="pi">${tc.i}</span>
+            <span class="pn">${d.name}</span>
+          </div>
+          <span class="b-cat" style="background:${cc2.badge}">${cc2.label}</span>
+          <span class="b-prio">${prio(d.decks)}</span>
+          ${d.isExtra?'<span class="b-new">NUEVA</span>':''}
+          <span class="b-tipo" style="color:${tc.c}">${tc.i} ${d.tipo}</span>
+          <span class="b-deck">${d.decks}x</span>
+        </div>
+        <span class="card-name">${d.name}</span>`;
+      grid.appendChild(el);
+      // Observe the card-wrap for lazy loading
+      observer.observe(el.querySelector('.card-wrap'));
+    });
+  });
+}
+
+// Modal
+async function openModal(idx){
+  currentIdx=idx;
+  currentCard=ALL_DATA[idx];
+  const d=currentCard;
+  const cc=CAT[d.cat]||CAT.basic;
+  const tc=TIPO[d.tipo]||TIPO.normal;
+
+  document.getElementById('mName').textContent=d.name;
+  document.getElementById('mTags').innerHTML=`
+    <span class="modal-tag" style="background:${cc.badge}22;color:${cc.border};border:1px solid ${cc.border}44">${cc.label}</span>
+    <span class="modal-tag" style="background:rgba(0,0,0,.3);color:${tc.c};border:1px solid ${tc.c}33">${tc.i} ${d.tipo}</span>
+    <span class="modal-tag" style="background:rgba(0,0,0,.3);color:#aaa;border:1px solid #333">${prio(d.decks)} ${d.decks} deck(s)</span>`;
+  document.getElementById('mDecks').textContent=(d.decksList||[]).join(' · ');
+  document.getElementById('versionPicker').style.display='none';
+
+  // Load image
+  const wrap=document.getElementById('mImgWrap');
+  wrap.innerHTML='<span class="modal-loading">Cargando...</span>';
+  const url=await getCardImg(d.name);
+  if(url){
+    wrap.innerHTML=`<img src="${url}" alt="${d.name}" style="max-height:280px;max-width:100%;object-fit:contain">`;
+  }else{
+    wrap.innerHTML=`<div style="font-size:40px;padding:40px">${tc.i}</div>`;
+  }
+
+  document.getElementById('modal').classList.add('open');
+}
+function handleModalBg(e){if(e.target===document.getElementById('modal'))closeModal();}
+function closeModal(){document.getElementById('modal').classList.remove('open');currentCard=null;currentIdx=-1;}
+
+function quickDel(idx){
+  if(!confirm(`¿Eliminar "${ALL_DATA[idx]?.name}"?`))return;
+  removeCard(idx);
+  showToast('🗑 Carta eliminada');
+}
+function deleteCard(){
+  if(currentIdx<0)return;
+  if(!confirm(`¿Eliminar "${currentCard.name}"?`))return;
+  closeModal();
+  removeCard(currentIdx);
+  showToast('🗑 Carta eliminada');
+}
+function removeCard(idx){
+  ALL_DATA.splice(idx,1);
+  saveLocal(ALL_DATA.filter(d=>d.isExtra));
+  document.getElementById('total-n').textContent=ALL_DATA.length;
+  filter();
+}
+
+async function startUpgrade(){
+  if(!currentCard)return;
+  const btn=document.querySelector('.mbtn-upgrade');
+  btn.textContent='⏳ Buscando...';btn.disabled=true;
+  const picker=document.getElementById('versionPicker');
+  const vgrid=document.getElementById('versionGrid');
+  picker.style.display='none';
+  vgrid.innerHTML='';
+  try{
+    const r=await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(currentCard.name)}"&pageSize=12&orderBy=-set.releaseDate`);
+    const data=await r.json();
+    if(!data.data?.length){showToast('No encontrada en API');return;}
+    data.data.forEach(card=>{
+      const el=document.createElement('div');
+      el.className='vcard';
+      el.innerHTML=`<img src="${card.images.small}" loading="lazy"><div class="vcard-set">${card.set.name}</div>`;
+      el.onclick=()=>applyVersion(card);
+      vgrid.appendChild(el);
+    });
+    picker.style.display='block';
+  }catch{showToast('Error de conexión');}
+  btn.textContent='🔄 Cambiar versión';btn.disabled=false;
+}
+
+function applyVersion(card){
+  if(!currentCard||currentIdx<0)return;
+  const url=card.images.large||card.images.small;
+  IMG_CACHE[currentCard.name]=url;
+  // Update modal image
+  document.getElementById('mImgWrap').innerHTML=`<img src="${url}" style="max-height:280px;max-width:100%;object-fit:contain">`;
+  document.getElementById('versionPicker').style.display='none';
+  // Refresh grid card image if loaded
+  const wraps=document.querySelectorAll(`.card-wrap[data-name="${currentCard.name}"]`);
+  wraps.forEach(w=>{
+    const img=w.querySelector('img');
+    if(img)img.src=url;
+  });
+  showToast(`✅ Versión actualizada — ${card.set.name}`);
+}
+
+// Panel
+function openPanel(mode){
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('panelOverlay').classList.add('open');
+  setMode(mode);
+}
+function closePanel(){
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
+}
+function setMode(m){
+  ['single','deck'].forEach(x=>{
+    document.getElementById('mode'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',m===x);
+  });
+  document.getElementById('mBtn1').classList.toggle('active',m==='single');
+  document.getElementById('mBtn2').classList.toggle('active',m==='deck');
+  document.getElementById('panelTitle').textContent=m==='single'?'＋ Agregar carta':'📋 Importar deck';
+}
+
+// Single card
+let selSingle=null;
+async function searchSingle(){
+  const q=document.getElementById('sSearch').value.trim();
+  if(!q)return;
+  document.getElementById('sStatus').textContent='Buscando...';
+  document.getElementById('sResults').innerHTML='';
+  document.getElementById('sForm').style.display='none';
+  selSingle=null;
+  try{
+    const r=await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(q)}"&pageSize=20&orderBy=-set.releaseDate`);
+    const data=await r.json();
+    if(!data.data?.length){document.getElementById('sStatus').textContent=`No encontrado: "${q}"`;return;}
+    document.getElementById('sStatus').textContent=`${data.data.length} versión(es) — elige la que tienes:`;
+    const grid=document.getElementById('sResults');
+    data.data.forEach(card=>{
+      const el=document.createElement('div');
+      el.className='sr-card';
+      el.innerHTML=`<img src="${card.images.small}" loading="lazy"><div class="sr-name">${card.name}</div><div class="sr-set">${card.set.name}</div>`;
+      el.onclick=()=>selectSingle(card,el);
+      grid.appendChild(el);
+    });
+  }catch{document.getElementById('sStatus').textContent='Error de conexión';}
+}
+function selectSingle(card,el){
+  document.querySelectorAll('.sr-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selSingle=card;
+  document.getElementById('sName').value=card.name;
+  const st=card.supertype?.toLowerCase()||'';
+  const sub=(card.subtypes||[]).map(s=>s.toLowerCase());
+  let cat='basic';
+  if(st==='trainer')cat=sub.includes('supporter')?'supp':sub.includes('stadium')?'stadium':'item';
+  else if(st==='energy')cat='energy';
+  else if(sub.some(s=>['ex','v','vmax','vstar','gx'].includes(s)))cat='ex';
+  document.getElementById('sCat').value=cat;
+  const types=(card.types||[]).map(t=>t.toLowerCase());
+  if(types[0]&&TYPE_MAP[types[0]])document.getElementById('sTipo').value=TYPE_MAP[types[0]];
+  document.getElementById('sForm').style.display='block';
+}
+function confirmSingle(){
+  if(!selSingle)return;
+  const name=document.getElementById('sName').value.trim();
+  if(getNameIdx().has(name.toLowerCase())&&!confirm(`"${name}" ya existe. ¿Agregar igual?`))return;
+  IMG_CACHE[name]=selSingle.images.large||selSingle.images.small;
+  addCard({name,cat:document.getElementById('sCat').value,tipo:document.getElementById('sTipo').value,
+    decks:parseInt(document.getElementById('sDecks').value)||1,
+    decksList:[document.getElementById('sDeck').value.trim()||'Manual']});
+  showToast(`✅ "${name}" agregada`);
+  document.getElementById('sSearch').value='';
+  document.getElementById('sResults').innerHTML='';
+  document.getElementById('sForm').style.display='none';
+  document.getElementById('sStatus').textContent='';
+  selSingle=null;
+}
+
+// Deck import
+let detCards=[];
+let deckLabel='';
+async function processDeck(){
+  const raw=document.getElementById('dList').value.trim();
+  deckLabel=document.getElementById('dLabel').value.trim()||'Importado';
+  if(!raw){showToast('Pega la lista primero');return;}
+  const names=raw.split(',').flatMap(function(s){return s.split(';');}).flatMap(function(s){return s.split('\n');}).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+  if(!names.length){showToast('Sin nombres válidos');return;}
+  const sb=document.getElementById('dStatus');
+  const st=document.getElementById('dStatusText');
+  const pf=document.getElementById('dProgress');
+  sb.classList.add('show');
+  const nameIdx=getNameIdx();
+  detCards=[];
+  for(let i=0;i<names.length;i++){
+    const name=names[i];
+    pf.style.width=`${Math.round((i+1)/names.length*100)}%`;
+    st.textContent=`${i+1}/${names.length}: ${name}`;
+    try{
+      const r=await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${encodeURIComponent(name)}"&pageSize=1&orderBy=-set.releaseDate`);
+      const data=await r.json();
+      const found=data.data?.[0];
+      if(found)IMG_CACHE[name]=found.images.large||found.images.small;
+      const st2=found?.supertype?.toLowerCase()||'';
+      const sub2=(found?.subtypes||[]).map(s=>s.toLowerCase());
+      let cat='basic';
+      if(st2==='trainer')cat=sub2.includes('supporter')?'supp':sub2.includes('stadium')?'stadium':'item';
+      else if(st2==='energy')cat='energy';
+      else if(sub2.some(s=>['ex','v','vmax','vstar','gx'].includes(s)))cat='ex';
+      const types2=(found?.types||[]).map(t=>t.toLowerCase());
+      const tipo=types2[0]&&TYPE_MAP[types2[0]]?TYPE_MAP[types2[0]]:'trainer';
+      detCards.push({name,cat,tipo,img:found?.images?.small||'',isDup:nameIdx.has(name.toLowerCase().trim()),skip:false});
+    }catch{
+      detCards.push({name,cat:'basic',tipo:'trainer',img:'',isDup:false,skip:false});
+    }
+  }
+  sb.classList.remove('show');
+  document.getElementById('dStep1').style.display='none';
+  document.getElementById('dStep2').style.display='block';
+  renderDetected();
+}
+function renderDetected(){
+  const dups=detCards.filter(c=>c.isDup).length;
+  const news=detCards.filter(c=>!c.isDup).length;
+  document.getElementById('dInfo').innerHTML=
+    `<strong style="color:var(--text)">${detCards.length} cartas</strong> — <span style="color:#4ade80">${news} nuevas</span>${dups?` · <span style="color:#facc15">${dups} ya existen</span>`:''}. Toca ✕ para ignorar.`;
+  const grid=document.getElementById('dGrid');
+  grid.innerHTML='';
+  detCards.forEach((c,i)=>{
+    const el=document.createElement('div');
+    el.className=`det-card${c.isDup?' dup':''}${c.skip?' skip':''}`;
+    el.id=`dc${i}`;
+    el.innerHTML=`
+      ${c.img?`<img src="${c.img}" loading="lazy">`:`<div class="det-no-img">?</div>`}
+      <span class="det-badge" style="background:${c.isDup?'#92400e':'#14532d'}">${c.isDup?'EXISTE':'NUEVA'}</span>
+      <button class="det-skip-btn" onclick="toggleSkip(${i})">✕</button>
+      <div class="det-label">${c.name}</div>`;
+    grid.appendChild(el);
+  });
+}
+function toggleSkip(i){
+  detCards[i].skip=!detCards[i].skip;
+  document.getElementById(`dc${i}`).classList.toggle('skip',detCards[i].skip);
+  document.getElementById(`dc${i}`).querySelector('.det-skip-btn').textContent=detCards[i].skip?'↩':'✕';
+}
+function confirmDeck(){
+  let added=0,skipped=0;
+  detCards.filter(c=>!c.skip).forEach(c=>{
+    if(c.isDup){skipped++;return;}
+    addCard({name:c.name,cat:c.cat,tipo:c.tipo,decks:1,decksList:[deckLabel]});
+    added++;
+  });
+  showToast(`✅ ${added} agregadas${skipped?` · ${skipped} ya existían`:''}`);
+  dBackToStep1();
+  closePanel();
+}
+function dBackToStep1(){
+  document.getElementById('dStep2').style.display='none';
+  document.getElementById('dStep1').style.display='block';
+  document.getElementById('dList').value='';
+  document.getElementById('dLabel').value='';
+  detCards=[];
+}
+
+function addCard(d){
+  const cc=CAT[d.cat]||CAT.basic;
+  const tc=TIPO[d.tipo]||TIPO.normal;
+  const card={...d,isExtra:true,prio:prio(d.decks)};
+  ALL_DATA.push(card);
+  saveLocal(ALL_DATA.filter(x=>x.isExtra));
+  document.getElementById('total-n').textContent=ALL_DATA.length;
+  filter();
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+renderGrid(ALL_DATA);
+</script>
+</body>
+</html>
