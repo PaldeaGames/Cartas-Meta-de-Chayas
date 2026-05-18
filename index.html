@@ -132,7 +132,7 @@ input[type=text]:focus,select:focus{border-color:var(--ac)}
       <select id="catf" onchange="filter()">
         <option value="">Todas</option><option value="ex">EX/V</option><option value="basic">Básico</option>
         <option value="supp">Supporter</option><option value="item">Item</option>
-        <option value="energy">Energía</option><option value="ace">ACE SPEC</option><option value="stadium">Stadium</option>
+        <option value="energy">Energía</option><option value="ace">ACE SPEC</option><option value="stadium">Stadium</option><option value="tool">Tool</option>
       </select>
     </div>
     <div class="cg"><span class="cl">Tipo</span>
@@ -186,6 +186,7 @@ input[type=text]:focus,select:focus{border-color:var(--ac)}
   <button class="tab" onclick="showTab('trainers',this)">Trainers</button>
   <button class="tab" onclick="showTab('energies',this)">Energías</button>
   <button class="tab" onclick="showTab('ace',this)">ACE / Stadium</button>
+  <button class="tab" onclick="showTab('tool',this)">🔧 Tools</button>
   <button class="tab" onclick="showTab('new',this)">✨ Nuevas</button>
 </div>
 <div class="content">
@@ -241,7 +242,7 @@ input[type=text]:focus,select:focus{border-color:var(--ac)}
           <div class="fg" style="flex:1"><span class="fl">Cat.</span>
             <select id="sCat"><option value="ex">EX/V</option><option value="basic">Básico</option>
             <option value="supp">Supporter</option><option value="item">Item</option>
-            <option value="energy">Energía</option><option value="ace">ACE</option><option value="stadium">Stadium</option></select>
+            <option value="energy">Energía</option><option value="ace">ACE</option><option value="stadium">Stadium</option><option value="tool">Tool</option></select>
           </div>
         </div>
         <div style="display:flex;gap:8px">
@@ -296,7 +297,8 @@ const CAT = {
   item:   {bg:'#1a1207',bd:'#fbbf24',bk:'#b45309',lb:'Item'},
   energy: {bg:'#0f0f0f',bd:'#94a3b8',bk:'#475569',lb:'Energía'},
   ace:    {bg:'#200010',bd:'#f472b6',bk:'#be185d',lb:'ACE SPEC'},
-  stadium:{bg:'#001a1a',bd:'#2dd4bf',bk:'#0f766e',lb:'Stadium'}
+  stadium:{bg:'#001a1a',bd:'#2dd4bf',bk:'#0f766e',lb:'Stadium'},
+  tool:   {bg:'#1a1207',bd:'#f97316',bk:'#c2410c',lb:'Tool'}
 };
 const TI = {
   grass:   {c:'#4ade80',i:'🌿'}, water:   {c:'#38bdf8',i:'💧'},
@@ -307,7 +309,7 @@ const TI = {
   trainer: {c:'#60a5fa',i:'🎴'}, ace:     {c:'#f472b6',i:'💎'},
   stadium: {c:'#2dd4bf',i:'🏟'}, energy:  {c:'#a78bfa',i:'⚡'}
 };
-const CO = ['ex','basic','supp','item','energy','ace','stadium'];
+const CO = ['ex','basic','supp','item','tool','energy','ace','stadium'];
 // Rarezas a excluir (arte especial/colección)
 const SKIP_RARITY = new Set([
   'Special Illustration Rare','Hyper Rare','Illustration Rare',
@@ -365,7 +367,12 @@ function apiCat(card){
   if(!card) return 'basic';
   const st  = (card.supertype||'').toLowerCase();
   const sub = (card.subtypes||[]).map(s=>s.toLowerCase());
-  if(st==='trainer') return sub.includes('supporter')?'supp': sub.includes('stadium')?'stadium':'item';
+  if(st==='trainer'){
+    if(sub.includes('supporter')) return 'supp';
+    if(sub.includes('stadium'))   return 'stadium';
+    if(sub.includes('pokémon tool') || sub.includes('pokemon tool') || sub.includes('tool')) return 'tool';
+    return 'item';
+  }
   if(st==='energy')  return 'energy';
   if(sub.some(s=>['ex','v','vmax','vstar','gx'].includes(s))) return 'ex';
   return 'basic';
@@ -492,6 +499,7 @@ function filter(){
     if(curTab==='trainers' && d.cat!=='supp' && d.cat!=='item') return false;
     if(curTab==='energies' && d.cat!=='energy') return false;
     if(curTab==='ace'      && d.cat!=='ace' && d.cat!=='stadium') return false;
+    if(curTab==='tool'     && d.cat!=='tool') return false;
     if(curTab==='new'      && !d.isExtra) return false;
     return true;
   });
